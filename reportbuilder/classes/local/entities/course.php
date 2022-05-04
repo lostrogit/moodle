@@ -223,7 +223,7 @@ class course extends base {
                 ->add_fields("{$tablealias}.{$field} as $key, {$tablealias}.id")
                 ->set_is_sortable(true)
                 ->add_callback(static function(?string $value, stdClass $row): string {
-                    if ($value === null) {
+                    if ($value === null || empty(trim($row->id))) {
                         return '';
                     }
 
@@ -446,7 +446,7 @@ class course extends base {
         }
 
         if (in_array($fieldname, ['fullname', 'shortname'])) {
-            if (!$row->courseid) {
+            if (!$row->courseid || empty(trim($row->courseid))) {
                 return '';
             }
             context_helper::preload_from_record($row);
@@ -455,7 +455,7 @@ class course extends base {
         }
 
         if (in_array($fieldname, ['summary'])) {
-            if (!$row->courseid) {
+            if (!$row->courseid || empty(trim($row->courseid))) {
                 return '';
             }
             context_helper::preload_from_record($row);
