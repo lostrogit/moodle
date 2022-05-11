@@ -49,3 +49,12 @@ $ADMIN->add(
         empty($CFG->enablecustomreports)
     )
 );
+
+$setting = new admin_settingpage('reportbuilder_settings', get_string('customreportssettings', 'core_reportbuilder'));
+
+$setting->add(new admin_setting_configtext(
+    'customreportslimit',
+    new lang_string('customreportslimit', 'core_reportbuilder'),
+    new lang_string('customreportslimit_desc', 'core_reportbuilder'), 0, PARAM_INT));
+
+$ADMIN->add('reportbuilder', $setting);

@@ -329,4 +329,35 @@ class permission_test extends advanced_testcase {
         $this->expectExceptionMessage('You cannot create a new report');
         permission::require_can_create_report();
     }
+
+    /**
+     * Test is_reportslimit_reached method to check site custom reports limit
+     */
+    public function test_is_reportslimit_reached(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $this->setAdminUser();
+
+        /** @var core_reportbuilder_generator $generator */
+        $generator = $this->getDataGenerator()->get_plugin_generator('core_reportbuilder');
+        $generator->create_report(['name' => 'First report', 'source' => users::class]);
+
+        // No limits have been set.
+        $this->assertFalse(permission::is_reportslimit_reached());
+
+        // Disable custom reports, limit should be ignored.
+        $CFG->enablecustomreports = false;
+        $CFG->customreportslimit = 1;
+        $this->assertFalse(permission::is_reportslimit_reached());
+
+        // Enable custom reports, set limit = 0 (no limit).
+        $CFG->enablecustomreports = true;
+        $CFG->customreportslimit = 0;
+        $this->assertFalse(permission::is_reportslimit_reached());
+
+        // Set site limit = 1.
+        $CFG->customreportslimit = 1;
+        $this->assertTrue(permission::is_reportslimit_reached());
+    }
 }

@@ -150,7 +150,7 @@ class permission {
         return !empty($CFG->enablecustomreports) && has_any_capability([
             'moodle/reportbuilder:edit',
             'moodle/reportbuilder:editall',
-        ], context_system::instance(), $userid);
+        ], context_system::instance(), $userid) && !self::is_reportslimit_reached();
     }
 
     /**
@@ -163,5 +163,21 @@ class permission {
         if (!static::can_create_report($userid)) {
             throw new report_access_exception('errorreportcreate');
         }
+    }
+
+    /**
+     * Configured site limit for number of custom reports threshold has been reached
+     *
+     * @return bool
+     */
+    public static function is_reportslimit_reached() : bool {
+        global $CFG;
+
+        $params['type'] = base::TYPE_CUSTOM_REPORT;
+        // Check if site reports limit has been set, is greater than zero and has been reached.
+        $limitsreached = isset($CFG->customreportslimit) && (int)$CFG->customreportslimit > 0
+            && (int)$CFG->customreportslimit <= report::count_records($params);
+
+        return isset($CFG->enablecustomreports) && $CFG->enablecustomreports && $limitsreached;
     }
 }
