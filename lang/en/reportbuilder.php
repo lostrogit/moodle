@@ -80,6 +80,7 @@ $string['courseshortnamewithlink'] = 'Course short name with link';
 $string['courseselect'] = 'Select course';
 $string['customfieldcolumn'] = '{$a}';
 $string['customreports'] = 'Custom reports';
+$string['customreportsliveeditingdisabled'] = 'Data pre-visualization is disabled by the site administrator. Click on the "Preview" button to see the report content';
 $string['deleteaudience'] = 'Delete audience \'{$a}\'';
 $string['deleteaudienceconfirm'] = 'Are you sure you want to delete the audience \'{$a}\'?';
 $string['deletecolumn'] = 'Delete column \'{$a}\'';

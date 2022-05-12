@@ -164,4 +164,15 @@ class permission {
             throw new report_access_exception('errorreportcreate');
         }
     }
+
+    /**
+     * Whether or not report data should be included in the table while in editing mode
+     *
+     * @return bool
+     */
+    public static function show_customreport_live_editing(): bool {
+        global $CFG;
+
+        return !empty($CFG->customreportsliveediting ?? true);
+    }
 }

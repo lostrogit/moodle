@@ -19,6 +19,7 @@ declare(strict_types=1);
 namespace core_reportbuilder\table;
 
 use core\output\notification;
+use core_reportbuilder\permission;
 use html_writer;
 use moodle_exception;
 use moodle_url;
@@ -280,9 +281,18 @@ class custom_report_table extends base_report_table {
         echo html_writer::end_tag('div');
         $this->wrap_html_finish();
 
-        $notification = (new notification(get_string('nothingtodisplay'), notification::NOTIFY_INFO, false))
+        $notificationmsg = get_string('nothingtodisplay');
+        $notificationtype = notification::NOTIFY_INFO;
+
+        if ($this->editing && !permission::show_customreport_live_editing()) {
+            $notificationmsg = get_string('customreportsliveeditingdisabled', 'core_reportbuilder');
+            $notificationtype = notification::NOTIFY_WARNING;
+        }
+
+        $notification = (new notification($notificationmsg, $notificationtype, false))
             ->set_extra_classes(['mt-3']);
         echo $OUTPUT->render($notification);
+
 
         echo $this->get_dynamic_table_html_end();
     }
@@ -313,5 +323,29 @@ class custom_report_table extends base_report_table {
             $html .= html_writer::tag('td', $button, ['class' => 'card-toggle d-none']);
         }
         return $html;
+    }
+
+    /**
+     * Overriding this method to handle live editing configuration.
+     */
+    function out($pagesize, $useinitialsbar, $downloadhelpbutton='') {
+        global $DB;
+        if (!$this->columns) {
+            $onerow = $DB->get_record_sql("SELECT {$this->sql->fields} FROM {$this->sql->from} WHERE {$this->sql->where}",
+                $this->sql->params, IGNORE_MULTIPLE);
+            //if columns is not set then define columns as the keys of the rows returned
+            //from the db.
+            $this->define_columns(array_keys((array)$onerow));
+            $this->define_headers(array_keys((array)$onerow));
+        }
+        $this->pagesize = $pagesize;
+        $this->setup();
+
+        if (!$this->editing || permission::show_customreport_live_editing()) {
+            $this->query_db($pagesize, $useinitialsbar);
+            $this->build_table();
+            $this->close_recordset();
+        }
+        $this->finish_output();
     }
 }
