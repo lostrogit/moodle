@@ -98,7 +98,10 @@ class course_category extends base {
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$tablealias}.name, {$tablealias}.id")
-            ->add_callback(static function(string $name, stdClass $category): string {
+            ->add_callback(static function(?string $name, stdClass $category): string {
+                if ($name === null || empty(trim($category->id))) {
+                    return '';
+                }
                 return core_course_category::get($category->id, MUST_EXIST, true)->get_formatted_name();
             })
             ->set_is_sortable(true);
@@ -112,7 +115,10 @@ class course_category extends base {
             ->add_joins($this->get_joins())
             ->set_type(column::TYPE_TEXT)
             ->add_fields("{$tablealias}.name, {$tablealias}.id")
-            ->add_callback(static function(string $name, stdClass $category): string {
+            ->add_callback(static function(?string $name, stdClass $category): string {
+                if ($name === null || empty(trim($category->id))) {
+                    return '';
+                }
                 return core_course_category::get($category->id, MUST_EXIST, true)->get_nested_name(false);
             })
             ->set_disabled_aggregation(['groupconcat', 'groupconcatdistinct'])
