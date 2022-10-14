@@ -49,7 +49,7 @@
 .eupopup-button:hover,
 .eupopup-button:focus {
     text-decoration: underline;
-    color: #f6a21d;
+    color: #0f6cbf;
 }
 
 /* tool_policy styles */
@@ -91,7 +91,7 @@
 }
 
 .eupopup-button {
-    color: #f6a21d;
+    color: #0f6cbf;
 }
 
 .policy-heading .policy-viewdoc-buttons {
