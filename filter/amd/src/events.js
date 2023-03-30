@@ -88,3 +88,46 @@ if (!legacyEventsRegistered) {
 
     legacyEventsRegistered = true;
 }
+
+// Identify web browser and Os in order to fix the 'scrollbar-width: thin' property to auto since this
+// property does not apply consistent in firefox browser for each Os (win/linux).
+const fixScroll = () => {
+    const platform = navigator?.userAgentData?.platform || navigator?.platform || 'undefined';
+    const userAgent = navigator?.userAgent || 'unknown';
+    const isLinux = platform.indexOf('Linux') !== -1;
+
+    if (isLinux && userAgent.match(/firefox|fxios/i)) {
+        // Set initial selectors to be found.
+        const selectors = ['[style*="scrollbar-width:thin"],[style*="scrollbar-width: thin"]'];
+        // Css RegExt used to found within the whole css rules.
+        const cssToSearch = /\bscrollbar-width:\s*thin;/;
+        // Get all style sheets added to the document.
+        const styles = Array.from(document.styleSheets);
+
+        // We need to go throughout all the styles rules created into previous located style sheets,
+        // then retrieve all existing 'scrollbar-width' properties with their own selector.
+        const filteredRules = styles.flatMap(styleSheet =>
+            Array.from(styleSheet.cssRules).filter(rule => cssToSearch.test(rule.cssText))
+        ).map(rule => {
+            if (!rule.cssRules || typeof rule.selectorText !== 'undefined') {
+                return rule.selectorText;
+            }
+            const nestedRule = Array.from(rule.cssRules).find(myRule => cssToSearch.test(myRule.cssText));
+            return nestedRule ? nestedRule.selectorText : '';
+        });
+        selectors.push(...filteredRules);
+
+        // Even though the scrollbarWidth = 'thin' property is applicable in firefox browser in general,
+        // we change it to 'auto' when is used by linux-firefox client in order to keep consistent the gap in the scrollbar.
+        document.querySelectorAll(selectors.join(',')).forEach(element => {
+            element.style.setProperty('scrollbar-width', 'auto');
+        });
+    }
+};
+
+// Call the fixScroll method when file is loaded and when the filterContentUpdated
+// event is triggered in order to fix the scroll bar.
+fixScroll();
+document.addEventListener(eventTypes.filterContentUpdated, () => {
+    fixScroll();
+});
