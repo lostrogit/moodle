@@ -397,6 +397,13 @@ All rights reserved.</copyright>
     <customised/>
   </library>
   <library>
+    <location>amd/src/autocomplete.js</location>
+    <name>autocomplete.js</name>
+    <description>Simple autocomplete pure vanilla Javascript library.</description>
+    <license>Apache</license>
+    <licenseversion>2.0</licenseversion>
+  </library>
+  <library>
     <location>maxmind/GeoIp2</location>
     <name>GeoIP2 PHP API</name>
     <description>Library for processing of GeoIP data files.</description>

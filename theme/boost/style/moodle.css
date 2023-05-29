@@ -26860,6 +26860,108 @@ blockquote {
   background-color: #d7e4d6;
 }
 
+.autoCompleteCustom {
+  display: grid;
+  right: 0;
+  position: absolute;
+}
+
+.autoCompleteCustom li > i {
+  color: #0f6cbf;
+}
+
+.autoCompleteCustom > input {
+  width: 370px;
+  height: 40px;
+  padding-left: 10px;
+  font-size: 1rem;
+  color: #747474;
+  border-radius: 4px;
+  border: 1px solid rgba(33, 33, 33, 0.2);
+  outline: 0;
+}
+
+.autoCompleteCustom > ul > div.no_result {
+  margin: 0.3rem;
+  padding: 0.3rem 0.5rem;
+  list-style: none;
+  text-align: left;
+  font-size: 1rem;
+  color: #212121;
+  transition: all 0.1s ease-in-out;
+  border-radius: 0.35rem;
+  background-color: rgb(255, 255, 255);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  outline: none;
+}
+
+.autoCompleteCustom > ul > div.header_result {
+  text-align: center;
+  background-color: #cce6ea;
+  padding: 5px;
+}
+
+.autoCompleteCustom > input::placeholder {
+  color: rgba(123, 123, 123, 0.5);
+  transition: all 0.3s ease;
+}
+
+.autoCompleteCustom > ul {
+  max-height: 450px;
+  overflow-y: scroll;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 0;
+  margin: 0.5rem 4.5rem 0 4.5rem;
+  border-radius: 4px;
+  background-color: #fff;
+  border: 2px solid rgba(206, 169, 169, 0.5);
+  z-index: 1000;
+  outline: 0;
+}
+
+.autoCompleteCustom > ul > li {
+  padding: 10px 20px;
+  list-style: none;
+  text-align: left;
+  font-size: 16px;
+  color: #212121;
+  transition: all 0.1s ease-in-out;
+  border-radius: 3px;
+  background-color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.autoCompleteCustom > ul > li::selection {
+  color: #fff;
+  background-color: #fff;
+}
+
+.autoCompleteCustom > ul > li:hover {
+  cursor: pointer;
+  background-color: #f8f9fa;
+}
+
+.autoCompleteCustom > ul > li mark {
+  background-color: transparent;
+  color: #000;
+  font-weight: 700;
+}
+
+.autoCompleteCustom > ul > li mark::selection {
+  color: #fff;
+  background-color: #fff;
+}
+
+.autoCompleteCustom > ul > li[aria-selected=true] {
+  background-color: rgba(123, 123, 123, 0.1);
+}
+
 .blockmovetarget .accesshide {
   position: relative;
   left: initial;

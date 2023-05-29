@@ -45,6 +45,7 @@ $hassiteconfig = has_capability('moodle/site:config', context_system::instance()
 if ($hassiteconfig && $PAGE->context instanceof \context_system) {
     $PAGE->add_header_action($OUTPUT->render_from_template('core_admin/header_search_input', [
         'action' => new moodle_url('/admin/search.php'),
+        'config' => $CFG->autocompletepagination,
     ]));
 }
 

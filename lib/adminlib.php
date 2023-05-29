@@ -8741,6 +8741,7 @@ function admin_externalpage_setup($section, $extrabutton = '', array $extraurlpa
         $PAGE->add_header_action($OUTPUT->render_from_template('core_admin/header_search_input', [
             'action' => new moodle_url('/admin/search.php'),
             'query' => $PAGE->url->get_param('query'),
+            'autocompletepag' => $CFG->autocompletepagination,
         ]));
     }
 

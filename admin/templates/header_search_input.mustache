@@ -41,12 +41,13 @@
              autocomplete="off"
              {{#query}}value="{{.}}"{{/query}}
       >
-      <div class="input-group-append">
-        <button type="submit" class="btn btn-primary search-icon">
-          {{#pix}} a/search, core {{/pix}}
-          <span class="sr-only">{{#str}} search, core {{/str}}</span>
-        </button>
-      </div>
     </div>
   </form>
 </div>
+<div id="autoCompleteResult" class="autoCompleteCustom"></div>
+<div class="selection"></div>
+{{#js}}
+    require(['core/autocomplete_loader'], function(autocomplete) {
+    autocomplete.init('searchinput-{{uniqid}}', '{{#str}} search, core {{/str}}', {{autocompletepag}});
+    });
+{{/js}}
