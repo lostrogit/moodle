@@ -90,4 +90,18 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
             new lang_string('configallowemojipickerincompatible', 'admin')
         ));
     }
+
+    $optionalsubsystems->add(new admin_setting_configtext(
+        'autocompletepagination',
+        new lang_string('autocompletepagination', 'search'),
+        new lang_string('autocompletepagination_desc', 'search'),
+        5,
+        PARAM_INT,
+        2));
+
+    $optionalsubsystems->add(new admin_setting_configcheckbox(
+        'autocompletemodal',
+        new lang_string('autocompletemodal', 'search'),
+        new lang_string('autocompletemodal_desc', 'search'),
+        1));
 }

@@ -398,6 +398,14 @@ All rights reserved.</copyright>
     <customised/>
   </library>
   <library>
+    <location>amd/src/autocomplete.js</location>
+    <name>autocomplete.js</name>
+    <description>A JavaScript library that lets you quickly build autocomplete experiences.</description>
+    <version>1.15.0</version>
+    <license>MIT</license>
+    <repository>https://github.com/algolia/autocomplete</repository>
+  </library>
+  <library>
     <location>maxmind/GeoIp2</location>
     <name>GeoIP2 PHP API</name>
     <description>Library for processing of GeoIP data files.</description>

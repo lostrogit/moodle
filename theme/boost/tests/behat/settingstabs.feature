@@ -14,9 +14,11 @@ Feature: Administration nav tabs
   Scenario: Navigate back to specific tab after search
     Given I log in as "admin"
     And I am on site homepage
+    And the following config values are set as admin:
+      | autocompletemodal | 0 |
     And I click on "Site administration" "link"
     And I set the field "Search" to "assignment"
-    And I press "Search"
+    And I click on "Click here ..." "link"
     # I should be redirected to the site admin tab with the complete list under it.
     # Testing the existence of at least one of the options in the node is sufficient.
     When I select "Users" from secondary navigation

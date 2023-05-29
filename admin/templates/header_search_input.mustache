@@ -25,28 +25,24 @@
         "query": "themedesigner"
     }
 }}
+
 <div class="simplesearchform d-flex justify-content-end">
   <form autocomplete="off" action="{{action}}" method="get" accept-charset="utf-8" class="mform form-inline simplesearchform">
     <div class="input-group">
       <label for="searchinput-{{uniqid}}">
         <span class="sr-only">{{#str}} search, core {{/str}}</span>
       </label>
-      <input type="text"
-             id="searchinput-{{uniqid}}"
-             class="form-control"
-             placeholder="{{#str}} search, core {{/str}}"
-             aria-label="{{#str}} search, core {{/str}}"
-             name="query"
-             data-region="input"
-             autocomplete="off"
-             {{#query}}value="{{.}}"{{/query}}
-      >
-      <div class="input-group-append">
-        <button type="submit" class="btn btn-primary search-icon">
-          {{#pix}} a/search, core {{/pix}}
+      <div id="autocomplete-{{uniqid}}"
+         style="min-width: 250px"
+         data-region="input"
+        >
           <span class="sr-only">{{#str}} search, core {{/str}}</span>
-        </button>
       </div>
     </div>
   </form>
 </div>
+{{#js}}
+    require(['core/autocomplete_loader'], function(autocomplete) {
+    autocomplete.init('autocomplete-{{uniqid}}','{{#str}} search, core {{/str}}',{{autocompletepag}},{{autocompletemodal}});
+    });
+{{/js}}

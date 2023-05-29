@@ -3165,6 +3165,12 @@ $functions = array(
         'type'        => 'read',
         'ajax'        => true,
     ],
+    'core_search_autocomplete' => [
+        'classname'   => 'core\external\autocomplete',
+        'description' => 'Search using autocomplete.js',
+        'type'        => 'read',
+        'ajax'        => true,
+    ],
 );
 
 $services = array(

@@ -52,6 +52,8 @@ $hassiteconfig = has_capability('moodle/site:config', $PAGE->context);
 if ($hassiteconfig) {
     $PAGE->add_header_action($OUTPUT->render_from_template('core_admin/header_search_input', [
         'action' => new moodle_url('/admin/search.php'),
+        'autocompletepag' => $CFG->autocompletepagination,
+        'autocompletemodal' => $CFG->autocompletemodal,
     ]));
 }
 
