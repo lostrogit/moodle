@@ -25722,9 +25722,11 @@ input[disabled] {
 }
 
 .visual-scroll-x {
-  scrollbar-width: thin;
   scrollbar-color: #0f6cbf #a2cff8;
   -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+html[data-browser="browser-firefox os-windows"] .visual-scroll-x {
+  scrollbar-width: thin;
 }
 .visual-scroll-x::-webkit-scrollbar {
   height: 8px;
@@ -29717,12 +29719,14 @@ body.drawer-ease {
   flex-wrap: nowrap;
   overflow-y: auto;
   padding: 0.4rem;
-  scrollbar-width: thin;
   scrollbar-color: #6a737b #f8f9fa;
 }
 .drawercontent .dropdown-menu .dropdown-item {
   width: 220px;
   white-space: normal;
+}
+html[data-browser="browser-firefox os-windows"] .drawercontent {
+  scrollbar-width: thin;
 }
 .drawercontent::-webkit-scrollbar {
   width: 12px;
@@ -36156,8 +36160,10 @@ span[data-flexitour=container][x-placement=right] div[data-role=arrow]:after, sp
 
 #page.drawers {
   margin-top: 50px;
-  scrollbar-width: thin;
   scrollbar-color: #6a737b #f8f9fa;
+}
+html[data-browser="browser-firefox os-windows"] #page.drawers {
+  scrollbar-width: thin;
 }
 #page.drawers::-webkit-scrollbar {
   width: 12px;
@@ -37021,8 +37027,10 @@ div.editor_atto_toolbar button .icon {
 .reportbuilder-wrapper .filters-dropdown .reportbuilder-filters-sidebar {
   max-height: calc(100vh - 50px - 1rem);
   overflow-y: auto;
-  scrollbar-width: thin;
   scrollbar-color: #6a737b #fff;
+}
+html[data-browser="browser-firefox os-windows"] .reportbuilder-wrapper .filters-dropdown .reportbuilder-filters-sidebar {
+  scrollbar-width: thin;
 }
 .reportbuilder-wrapper .filters-dropdown .reportbuilder-filters-sidebar::-webkit-scrollbar {
   width: 12px;
@@ -37122,8 +37130,10 @@ div.editor_atto_toolbar button .icon {
 
 .reportbuilder-sidebar-menu-cards {
   overflow-y: auto;
-  scrollbar-width: thin;
   scrollbar-color: #6a737b #f8f9fa;
+}
+html[data-browser="browser-firefox os-windows"] .reportbuilder-sidebar-menu-cards {
+  scrollbar-width: thin;
 }
 .reportbuilder-sidebar-menu-cards::-webkit-scrollbar {
   width: 12px;
@@ -37143,8 +37153,10 @@ div.editor_atto_toolbar button .icon {
 /* Settings sidebar */
 .reportbuilder-sidebar-settings {
   overflow-y: auto;
-  scrollbar-width: thin;
   scrollbar-color: #6a737b #f8f9fa;
+}
+html[data-browser="browser-firefox os-windows"] .reportbuilder-sidebar-settings {
+  scrollbar-width: thin;
 }
 .reportbuilder-sidebar-settings::-webkit-scrollbar {
   width: 12px;
@@ -37256,10 +37268,12 @@ div.editor_atto_toolbar button .icon {
   .path-admin-reportbuilder.pagelayout-popup .reportbuilder-report[data-editing] .reportbuilder-report-container {
     max-height: calc(100vh - 153px);
     overflow-y: auto;
-    scrollbar-width: thin;
     scrollbar-color: #6a737b #f8f9fa;
     margin-left: calc(250px + 1rem);
     margin-right: calc(350px + 1rem);
+  }
+  html[data-browser="browser-firefox os-windows"] .path-admin-reportbuilder.pagelayout-popup .reportbuilder-report[data-editing] .reportbuilder-report-container {
+    scrollbar-width: thin;
   }
   .path-admin-reportbuilder.pagelayout-popup .reportbuilder-report[data-editing] .reportbuilder-report-container::-webkit-scrollbar {
     width: 12px;
@@ -37838,8 +37852,10 @@ div.editor_atto_toolbar button .icon {
 .popover-process-monitor .process-list {
   max-height: 30vh;
   overflow: auto;
-  scrollbar-width: thin;
   scrollbar-color: #6a737b #f8f9fa;
+}
+html[data-browser="browser-firefox os-windows"] .popover-process-monitor .process-list {
+  scrollbar-width: thin;
 }
 .popover-process-monitor .process-list::-webkit-scrollbar {
   width: 12px;

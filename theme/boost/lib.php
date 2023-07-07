@@ -164,3 +164,24 @@ function theme_boost_get_pre_scss($theme) {
 
     return $scss;
 }
+
+/**
+ * Callback used to add data attribute to html element.
+ *
+ * @return array
+ */
+function theme_boost_add_htmlattributes(): array {
+    $useragent = \core_useragent::instance();
+
+    // Initially browser is empty.
+    $browser = "";
+
+    // Detecting the Browser(Firefox) and OS(Windows), if it matches then 'scrollbar-width: thin' is applied.
+    if ($useragent::is_firefox() && $useragent::check_browser_operating_system('Windows')) {
+        $browser = "browser-firefox os-windows";
+    }
+
+    return [
+        'data-browser' => $browser,
+    ];
+}
