@@ -2833,7 +2833,9 @@ $scrollbar-thumb: $primary;
 $scrollbar-track: lighten($primary, 40%);
 // simple scrollbars
 .visual-scroll-x {
-    scrollbar-width: thin;
+    html[data-browser="browser-firefox os-windows"] & {
+        scrollbar-width: thin;
+    }
     scrollbar-color: $scrollbar-thumb $scrollbar-track;
     -ms-overflow-style: -ms-autohiding-scrollbar;
     &::-webkit-scrollbar {
@@ -2854,8 +2856,10 @@ $scrollbar-track: lighten($primary, 40%);
 // Thin scrollbars.
 @mixin thin-scrolls($bg-track) {
 
-    // Firefox.
-    scrollbar-width: thin;
+    // Only apply this property in Firefox-windows in order to be consistent with the gap.
+    html[data-browser="browser-firefox os-windows"] & {
+        scrollbar-width: thin;
+    }
     scrollbar-color: $thin-scroll-bg-thumb $bg-track;
 
     // Chrome, Edge and Safari.
