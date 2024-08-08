@@ -18,6 +18,9 @@ declare(strict_types=1);
 
 namespace customfield_number;
 
+use context_system;
+use core\context;
+use html_writer;
 use MoodleQuickForm;
 
 /**
@@ -62,6 +65,37 @@ class field_controller  extends \core_customfield\field_controller {
             $mform->setDefault('configdata[decimalplaces]', 0);
         }
         $mform->setType('configdata[decimalplaces]', PARAM_INT);
+
+        // Display format settings.
+        $randelname = 'str_' . random_string();
+        $mform->addGroup([], $randelname, html_writer::tag('h4', get_string('headerdisplaysettings', 'customfield_number')));
+
+        // Display template.
+        $mform->addElement('text', 'configdata[display]', get_string('display', 'customfield_number'),
+            ['size' => 50]);
+        $mform->setType('configdata[display]', PARAM_TEXT);
+        $mform->addHelpButton('configdata[display]', 'display', 'customfield_number');
+        if ($this->get_configdata_property('display') === null) {
+            $mform->setDefault('configdata[display]', '%g');
+        }
+
+        // Display when zero.
+        $mform->addElement('text', 'configdata[displaywhenzero]', get_string('displaywhenzero', 'customfield_number'),
+            ['size' => 50]);
+        $mform->setType('configdata[displaywhenzero]', PARAM_TEXT);
+        $mform->addHelpButton('configdata[displaywhenzero]', 'displaywhenzero', 'customfield_number');
+        if ($this->get_configdata_property('displaywhenzero') === null) {
+            $mform->setDefault('configdata[displaywhenzero]', 0);
+        }
+
+        // Display when empty.
+        $mform->addElement('text', 'configdata[displaywhenempty]', get_string('displaywhenempty', 'customfield_number'),
+            ['size' => 50]);
+        $mform->setType('configdata[displaywhenempty]', PARAM_TEXT);
+        $mform->addHelpButton('configdata[displaywhenempty]', 'displaywhenempty', 'customfield_number');
+        if ($this->get_configdata_property('displaywhenempty') === null) {
+            $mform->setDefault('configdata[displaywhenempty]', '');
+        }
     }
 
     /**
@@ -73,6 +107,13 @@ class field_controller  extends \core_customfield\field_controller {
      */
     public function config_form_validation(array $data, $files = []): array {
         $errors = parent::config_form_validation($data, $files);
+
+        $display = $data['configdata']['display'];
+        if ($display !== '') {
+            if (!preg_match('/%%|%(?:\d+\$)?[+-]?(?:0|\'[^%])?-?\d*(?:\.\d+)?[bcdeEfFgGosuxX]/', $display)) {
+                $errors['configdata[display]'] = get_string('displayvalueconfigerror', 'customfield_number');
+            }
+        }
 
         // Each of these configuration fields are optional.
         $defaultvalue = $data['configdata']['defaultvalue'] ?? '';
@@ -102,5 +143,39 @@ class field_controller  extends \core_customfield\field_controller {
         }
 
         return $errors;
+    }
+
+    /**
+     * Prepares a value for export
+     *
+     * @param mixed $value
+     * @param context|null $context
+     * @return string|null
+     */
+    public function prepare_field_for_display(mixed $value, ?context $context = null): ?string {
+        if (trim((string)$value) === '') {
+            $value = $this->get_configdata_property('displaywhenempty');
+            if ((string) $value === '') {
+                return null;
+            }
+        } else if ((float)$value == 0) {
+            $value = $this->get_configdata_property('displaywhenzero');
+            if ((string) $value === '') {
+                return null;
+            }
+        } else {
+            // Let's format the value.
+            $decimalplaces = (int) $this->get_configdata_property('decimalplaces');
+            $value = round((float) $value, $decimalplaces);
+
+            // Check if the display format is stored, if not, use the default one '%g'.
+            $format = $this->get_configdata_property('display') ?? '%g';
+            preg_match_all('/%%|%(?:\d+\$)?[+-]?(?:0|\'[^%])?-?\d*(?:\.\d+)?[bcdeEfFgGosuxX]/', $format, $matches);
+
+            // Once we have the format specifiers (accepting multiple placeholders), we can use them to format the value.
+            $values = array_fill(0, count($matches[0]), $value);
+            $value = vsprintf($format, $values);
+        }
+        return format_string($value, true, ['context' => $context ?? context_system::instance()]);
     }
 }
