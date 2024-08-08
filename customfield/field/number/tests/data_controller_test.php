@@ -21,6 +21,15 @@ namespace customfield_number;
 use advanced_testcase;
 use core_customfield_generator;
 use core_customfield_test_instance_form;
+use core_external\external_api;
+use core_external\util;
+use webservice;
+
+defined('MOODLE_INTERNAL') || die();
+
+global $CFG;
+
+require_once($CFG->dirroot . '/webservice/lib.php');
 
 /**
  * Tests for the data controller
@@ -121,11 +130,54 @@ final class data_controller_test extends advanced_testcase {
     }
 
     /**
-     * Test exporting instance
+     * Data provider for {@see test_export_value}
+     *
+     * @return array[]
      */
-    public function test_export_value(): void {
+    public static function export_value_provider(): array {
+        $template = '<span class="multilang" lang="en">$ %.02f</span><span class="multilang" lang="es">€ %.02f</span>';
+        $whenzero = '<span class="multilang" lang="en">Unknown</span><span class="multilang" lang="es">Desconocido</span>';
+        $whenempty = '<span class="multilang" lang="en">Free</span><span class="multilang" lang="es">Gratis</span>';
+        return [
+            'Export float value' => [42, 42.0, []],
+            'Export value with a prefix' => [10, '$ 10.00', [
+                'display' => $template,
+                'displaywhenzero' => 0,
+                'displaywhenempty' => ''],
+            ],
+            'Export value when zero' => [0, 'Unknown', [
+                'display' => '%g',
+                'displaywhenzero' => $whenzero,
+                'displaywhenempty' => ''],
+            ],
+            'Export value when empty' => ['', 'Free', [
+                'display' => '%g',
+                'displaywhenzero' => 0,
+                'displaywhenempty' => $whenempty],
+            ],
+        ];
+    }
+
+    /**
+     * Test exporting instance
+     *
+     * @param float|string $datavalue
+     * @param float|string $expectedvalue
+     * @param array $configdata
+     *
+     * @dataProvider export_value_provider
+     */
+    public function test_export_value(
+        float|string $datavalue,
+        float|string $expectedvalue,
+        array $configdata,
+    ): void {
         $this->resetAfterTest();
         $this->setAdminUser();
+
+        // Enable multilang filter.
+        filter_set_global_state('multilang', TEXTFILTER_ON);
+        filter_set_applies_to_strings('multilang', true);
 
         $course = $this->getDataGenerator()->create_course();
 
@@ -133,10 +185,31 @@ final class data_controller_test extends advanced_testcase {
         $generator = $this->getDataGenerator()->get_plugin_generator('core_customfield');
 
         $category = $generator->create_category();
-        $field = $generator->create_field(['categoryid' => $category->get('id'), 'type' => 'number']);
-        $data = $generator->add_instance_data($field, (int) $course->id, 42);
+        $field = $generator->create_field([
+            'categoryid' => $category->get('id'),
+            'type' => 'number',
+            'configdata' => $configdata,
+        ]);
+        $data = $generator->add_instance_data($field, (int) $course->id, $datavalue);
 
         $result = \core_customfield\data_controller::create($data->get('id'))->export_value();
-        $this->assertEquals(42.0, $result);
+        $this->assertEquals($expectedvalue, $result);
+
+        // Let's test returned custom field via core_course_get_courses_by_field WS.
+        $webservicemanager = new webservice;
+        $service = $webservicemanager->get_external_service_by_shortname(MOODLE_OFFICIAL_MOBILE_SERVICE);
+        $token = util::generate_token_for_current_user($service);
+        $_POST['wstoken'] = $token->token;
+        $_POST['sesskey'] = sesskey();
+
+        $result = external_api::call_external_function('core_course_get_courses_by_field', [
+            'field' => 'id',
+            'value' => $course->id,
+        ]);
+
+        $this->assertFalse($result['error']);
+        $customfield = $result['data']['courses'][0]['customfields'][0];
+
+        $this->assertEquals($expectedvalue, $customfield['value']);
     }
 }
