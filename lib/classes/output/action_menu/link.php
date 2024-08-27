@@ -61,9 +61,17 @@ class link extends action_link implements renderable {
      * @param string $text The text to represent the action.
      * @param bool $primary Whether this is a primary action or not.
      * @param array $attributes Any attribtues associated with the action.
+     * @param array $subactions Subactions of this action.
      */
-    public function __construct(moodle_url $url, ?pix_icon $icon, $text, $primary = true, array $attributes = []) {
-        parent::__construct($url, $text, null, $attributes, $icon);
+    public function __construct(
+        moodle_url $url,
+        ?pix_icon $icon,
+        $text,
+        $primary = true,
+        array $attributes = [],
+        array $subactions = []
+    ) {
+        parent::__construct($url, $text, null, $attributes, $icon, $subactions);
         $this->primary = (bool)$primary;
         $this->add_class('menu-action');
         $this->attributes['role'] = 'menuitem';

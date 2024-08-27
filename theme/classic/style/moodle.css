@@ -26161,6 +26161,22 @@ body.behat-site .action-menu .dropdown-subpanel-content.show {
 .action-menu .dropdown-subpanel .dropdown-item::before {
   display: none;
 }
+.action-menu .dropdown-submenu {
+  position: relative;
+}
+.action-menu .dropdown-submenu .dropdown-menu {
+  margin-right: 0;
+}
+.action-menu .dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+  top: 0;
+  right: 100%;
+  margin-top: -6px;
+}
+.action-menu .dropdown-submenu span.menu-action-arrow {
+  right: 0;
+  position: absolute;
+}
 
 @keyframes animate-pop {
   0% {

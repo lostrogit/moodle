@@ -21,20 +21,31 @@
 
     Example context (json):
     {
+        "hassubactions": false,
+        "icon": {
+            "key": "i/dashboard",
+            "component": null,
+            "title": "Dashboard"
+        },
         "text": "Example link text",
         "showtext": true,
         "url": "http://example.com/link"
     }
 }}
 {{^disabled}}
-    <a href="{{url}}" class="{{$actionmenulinkclasses}}aabtn {{classes}}{{/actionmenulinkclasses}}" {{#attributes}}{{name}}="{{value}}" {{/attributes}}>
-        {{#icon}}
-            {{#pix}}{{key}}, {{component}}, {{title}}{{/pix}}
-        {{/icon}}
-        {{#showtext}}
-            <span class="menu-action-text">{{{text}}}</span>
-        {{/showtext}}
-    </a>
+    {{^hassubactions}}
+        <a href="{{url}}" class="{{$actionmenulinkclasses}}aabtn {{classes}}{{/actionmenulinkclasses}}" {{#attributes}}{{name}}="{{value}}" {{/attributes}}>
+            {{#icon}}
+                {{#pix}}{{key}}, {{component}}, {{title}}{{/pix}}
+            {{/icon}}
+            {{#showtext}}
+                <span class="menu-action-text">{{{text}}}</span>
+            {{/showtext}}
+        </a>
+    {{/hassubactions}}
+    {{#hassubactions}}
+        {{> core/action_submenu}}
+    {{/hassubactions}}
 {{/disabled}}
 {{#disabled}}
     <span class="currentlink" role="menuitem">{{#icon}}{{#pix}}{{key}},{{component}},{{title}}{{/pix}}{{/icon}}{{{text}}}</span>

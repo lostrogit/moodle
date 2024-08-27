@@ -1,0 +1,5 @@
+issueNumber: MDL-82586
+notes:
+  core:
+    - message: Now action menu links can have sub actions in multiple levels
+      type: improved

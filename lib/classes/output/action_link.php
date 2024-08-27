@@ -56,19 +56,27 @@ class action_link implements renderable {
     public $icon;
 
     /**
+     * Subactions of this action.
+     * @var array
+     */
+    public $subactions = [];
+
+    /**
      * Constructor
      * @param moodle_url $url
      * @param string $text HTML fragment
      * @param null|component_action $action
      * @param null|array $attributes associative array of html link attributes + disabled
      * @param null|pix_icon $icon optional pix_icon to render with the link text
+     * @param array $subactions optional array of subactions
      */
     public function __construct(
         moodle_url $url,
         $text,
         ?component_action $action = null,
         ?array $attributes = null,
-        ?pix_icon $icon = null
+        ?pix_icon $icon = null,
+        array $subactions = []
     ) {
         $this->url = clone($url);
         $this->text = $text;
@@ -80,6 +88,7 @@ class action_link implements renderable {
             $this->add_action($action);
         }
         $this->icon = $icon;
+        $this->subactions = $subactions;
     }
 
     /**
@@ -157,6 +166,9 @@ class action_link implements renderable {
             return $action->export_for_template($output);
         }, !empty($this->actions) ? $this->actions : []);
         $data->hasactions = !empty($this->actions);
+
+        $data->hassubactions = !empty($this->subactions);
+        $data->subactions = $this->subactions;
 
         return $data;
     }

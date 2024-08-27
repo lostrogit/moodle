@@ -48,6 +48,24 @@
             display: none;
         }
     }
+
+    // Dropdown submenus
+    .dropdown-submenu {
+        position: relative;
+        .dropdown-menu {
+            margin-right: 0;
+        }
+        &:hover > .dropdown-menu {
+            display: block;
+            top: 0;
+            right: 100%;
+            margin-top: -6px;
+        }
+        span.menu-action-arrow {
+            right: 0;
+            position: absolute;
+        }
+    }
 }
 
 @keyframes animate-pop {
