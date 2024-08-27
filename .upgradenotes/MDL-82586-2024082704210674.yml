@@ -1,0 +1,8 @@
+issueNumber: MDL-82586
+notes:
+  core_reportbuilder:
+    - message: >-
+        New `add_subaction()` method can now add new sub menus to all current menus,
+        make it able to add sub menus and render them in multiple levels.
+        Also each new sub menu is a `core_reportbuilder\local\report\action` instance.
+      type: changed

@@ -44,6 +44,7 @@ class action_test extends advanced_testcase {
             });
 
         $this->assertNotNull($action->get_action_link(new stdClass()));
+        $this->assertNotNull($action->get_action_link(new stdClass(), true));
     }
 
     /**
@@ -56,6 +57,7 @@ class action_test extends advanced_testcase {
             });
 
         $this->assertNull($action->get_action_link(new stdClass()));
+        $this->assertNull($action->get_action_link(new stdClass(), true));
     }
 
     /**
@@ -100,7 +102,9 @@ class action_test extends advanced_testcase {
 
         // Assert correct title appears inside action link, after the icon.
         $actionlink = $action->get_action_link((object) $row);
+        $subactionlink = $action->get_action_link((object) $row, true);
         $this->assertEquals('Yes', $actionlink->text);
+        $this->assertEquals('Yes', $subactionlink->text);
     }
 
     /**
@@ -109,10 +113,12 @@ class action_test extends advanced_testcase {
     public function test_get_action_link_url_parameters(): void {
         $action = $this->create_action(['id' => ':id', 'action' => 'edit']);
         $actionlink = $action->get_action_link((object) ['id' => 42]);
+        $subactionlink = $action->get_action_link((object) ['id' => 42], true);
 
         // This is the action URL we expect.
         $expectedactionurl = (new moodle_url('/', ['id' => 42, 'action' => 'edit']))->out(false);
         $this->assertEquals($expectedactionurl, $actionlink->url->out(false));
+        $this->assertEquals($expectedactionurl, $subactionlink->url->out(false));
     }
 
     /**
@@ -121,6 +127,7 @@ class action_test extends advanced_testcase {
     public function test_get_action_link_attributes(): void {
         $action = $this->create_action([], ['data-id' => ':id', 'data-action' => 'edit']);
         $actionlink = $action->get_action_link((object) ['id' => 42]);
+        $subactionlink = $action->get_action_link((object) ['id' => 42], true);
 
         // We expect each of these attributes to exist.
         $expectedattributes = [
@@ -129,6 +136,7 @@ class action_test extends advanced_testcase {
         ];
         foreach ($expectedattributes as $key => $value) {
             $this->assertEquals($value, $actionlink->attributes[$key]);
+            $this->assertEquals($value, $subactionlink->attributes[$key]);
         }
     }
 
@@ -145,5 +153,163 @@ class action_test extends advanced_testcase {
             new pix_icon('t/edit', get_string('edit')),
             $attributes
         );
+    }
+
+    /**
+     * Data provider for {@see test_add_subactions}
+     *
+     * @return array[]
+     */
+    public static function sub_actions_provider(): array {
+        return [
+            'First level sub action' => [
+                [
+                    [
+                        'action' => 'copy',
+                        'callback' => true,
+                    ],
+                    [
+                        'action' => 'view',
+                        'callback' => true,
+                    ],
+                ],
+                2,
+            ],
+            'Second level sub actions' => [
+                [
+                    [
+                        'action' => 'copy',
+                        'callback' => true,
+                        'subaction' => [
+                            'action' => 'delete',
+                            'callback' => true,
+                        ],
+                    ],
+                ],
+                2,
+            ],
+            'Third level sub actions' => [
+                [
+                    [
+                        'action' => 'copy',
+                        'callback' => true,
+                        'subaction' => [
+                            'action' => 'view',
+                            'callback' => true,
+                            'subaction' => [
+                                'action' => 'delete',
+                                'callback' => true,
+                            ],
+                        ],
+                    ],
+                ],
+                3,
+            ],
+            'First level sub action with some not available ' => [
+                [
+                    [
+                        'action' => 'copy',
+                        'callback' => true,
+                    ],
+                    [
+                        'action' => 'view',
+                        'callback' => false,
+                    ],
+                ],
+                1, // Only one sub action ('copy') is available.
+            ],
+            'Second level sub actions with some not available' => [
+                [
+                    [
+                        'action' => 'copy',
+                        'callback' => true,
+                        'subaction' => [
+                            'action' => 'delete',
+                            'callback' => false,
+                        ],
+                    ],
+                ],
+                1, // Only one sub action ('copy') is available.
+            ],
+            'Third level sub actions with some not available' => [
+                [
+                    [
+                        'action' => 'copy',
+                        'callback' => true,
+                        'subaction' => [
+                            'action' => 'view',
+                            'callback' => false,
+                            'subaction' => [
+                                'action' => 'delete',
+                                'callback' => true,
+                            ],
+                        ],
+                    ],
+                ],
+                1, // Only one sub action ('copy') is available since 'view'
+                // sub action is not available therefore 'delete' sub action is not available.
+            ],
+        ];
+    }
+
+    /**
+     * Test add sub actions
+     *
+     * @param array $subactions
+     * @param int $expectedsubactions
+     *
+     * @dataProvider sub_actions_provider
+     */
+    public function test_add_subactions(array $subactions, int $expectedsubactions): void {
+        $mainaction = $this->create_action(['id' => ':id', 'action' => 'edit']);
+
+        // Check if the action has subactions.
+        $this->assertFalse($mainaction->has_subactions());
+
+        // Process subactions recursively.
+        $subactionadded = $this->processsubactions($mainaction, $subactions);
+
+        // Check if the action has subactions.
+        $this->assertTrue($mainaction->has_subactions());
+
+        // Check if the action has the correct number of subactions.
+        $this->assertEquals($expectedsubactions, $subactionadded);
+    }
+
+    /**
+     * Process subactions recursively
+     *
+     * @param action $action
+     * @param array $subactions
+     *
+     * @return int
+     */
+    private function processsubactions(action $action, array $subactions): int {
+        $countsubactions = 0;
+        $actiondata = ['id' => ':id'];
+        foreach ($subactions as $subaction) {
+            $actiondata['action'] = $subaction['action'];
+            $callbackreturn = $subaction['callback'];
+            $currentaction = $this->create_action($actiondata)
+                ->add_callback(static function(stdClass $row) use ($callbackreturn): bool {
+                    return $callbackreturn;
+                });
+            if ($currentaction->get_action_link(new stdClass()) === null) {
+                continue;
+            }
+            if (isset($subaction['subaction'])) {
+                $currentaction = $this->create_action($actiondata)
+                    ->add_callback(static function(stdClass $row) use ($callbackreturn): bool {
+                        return $callbackreturn;
+                    });
+                if ($currentaction->get_action_link(new stdClass(), true) === null) {
+                    continue;
+                }
+                $countsubactions += $this->processsubactions($currentaction, [$subaction['subaction']]);
+            }
+            $countsubactions++;
+            $action->add_subaction($currentaction);
+        }
+        return $countsubactions;
     }
 }
