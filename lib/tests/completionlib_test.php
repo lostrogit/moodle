@@ -2086,6 +2086,43 @@ class completionlib_test extends advanced_testcase {
             ['course' => $this->course->id]
         ));
     }
+
+    /**
+     * Test for count_modules_completed().
+     *
+     * @covers ::count_modules_completed
+     */
+    public function test_count_modules_completed(): void {
+        global $DB;
+
+        $this->setup_data();
+        $this->setUser($this->user);
+
+        /** @var \mod_assign_generator $assigngenerator */
+        $assigngenerator = $this->getDataGenerator()->get_plugin_generator('mod_assign');
+        $assign = $assigngenerator->create_instance([
+            'course' => $this->course->id,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionsubmit' => true,
+        ]);
+
+        $cm = get_coursemodule_from_instance('assign', $assign->id);
+        $cmcompletionrecord = (object) [
+            'coursemoduleid' => $cm->id,
+            'userid' => $this->user->id,
+            'completionstate' => COMPLETION_COMPLETE,
+            'overrideby' => null,
+            'timemodified' => 0,
+        ];
+
+        $DB->insert_record('course_modules_completion', $cmcompletionrecord);
+        $count = $DB->count_records('course_modules_completion');
+
+        $completion = new completion_info($this->course);
+        $totalcompleted = $completion->count_modules_completed($this->user->id);
+
+        $this->assertEquals($count, $totalcompleted);
+    }
 }
 
 class core_completionlib_fake_recordset implements Iterator {
