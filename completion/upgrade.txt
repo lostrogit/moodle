@@ -1,6 +1,10 @@
 This file describes API changes in /completion/* - completion,
 information provided here is intended especially for developers.
 
+=== 4.4.6 ===
+* The method `count_modules_completed` now delegate the logic to count the completed modules to the DBMS improving
+  the performance of the method.
+
 === 4.4.1 ===
 * get_overall_completion_state() function could also return COMPLETION_COMPLETE_FAIL and not only COMPLETION_COMPLETE
   and COMPLETION_INCOMPLETE

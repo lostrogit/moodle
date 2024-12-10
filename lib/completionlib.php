@@ -1651,12 +1651,13 @@ class completion_info {
     public function count_modules_completed(int $userid): int {
         global $DB;
 
-        $join = "JOIN {course_modules_completion} cmc ON cm.id=cmc.coursemoduleid";
-        $where = "cm.course=:courseid AND cmc.userid=:userid AND ";
-        $where .= "(cmc.completionstate=" . COMPLETION_COMPLETE . " OR cmc.completionstate=" . COMPLETION_COMPLETE_PASS . ")";
+        $sql = "SELECT COUNT(1) FROM {course_modules} cm
+                    JOIN {course_modules_completion} cmc ON cm.id = cmc.coursemoduleid
+                        WHERE cm.course = :courseid AND cmc.userid = :userid AND (cmc.completionstate = " . COMPLETION_COMPLETE . "
+                        OR cmc.completionstate = " . COMPLETION_COMPLETE_PASS . ")";
         $params = ['courseid' => $this->course_id, 'userid' => $userid];
 
-        return $DB->count_records_sql("SELECT COUNT(1) FROM {course_modules} cm {$join} WHERE {$where}", $params);
+        return $DB->count_records_sql($sql, $params);
     }
 }
 
