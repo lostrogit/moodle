@@ -2105,6 +2105,11 @@ class completionlib_test extends advanced_testcase {
             'completion' => COMPLETION_TRACKING_AUTOMATIC,
             'completionsubmit' => true,
         ]);
+        $assign1 = $assigngenerator->create_instance([
+            'course' => $this->course->id,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionsubmit' => true,
+        ]);
 
         $cm = get_coursemodule_from_instance('assign', $assign->id);
         $cmcompletionrecord = (object) [
@@ -2115,7 +2120,16 @@ class completionlib_test extends advanced_testcase {
             'timemodified' => 0,
         ];
 
-        $DB->insert_record('course_modules_completion', $cmcompletionrecord);
+        $cm1 = get_coursemodule_from_instance('assign', $assign1->id);
+        $cmcompletionrecord1 = (object) [
+            'coursemoduleid' => $cm1->id,
+            'userid' => $this->user->id,
+            'completionstate' => COMPLETION_COMPLETE_PASS,
+            'overrideby' => null,
+            'timemodified' => 0,
+        ];
+
+        $DB->insert_records('course_modules_completion', [$cmcompletionrecord, $cmcompletionrecord1]);
         $count = $DB->count_records('course_modules_completion');
 
         $completion = new completion_info($this->course);
