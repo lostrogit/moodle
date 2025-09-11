@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace core_reportbuilder\local\report;
 
+use action_link;
 use action_menu_link;
 use lang_string;
 use moodle_url;
@@ -52,6 +53,9 @@ final class action {
     /** @var lang_string|string $title */
     protected $title;
 
+    /** @var array $subactions */
+    protected $subactions = [];
+
     /**
      * Create an instance of an action to be added to a report. Both the parameters of the URL, and the attributes parameter
      * support placeholders which will be replaced with appropriate row values, e.g.:
@@ -71,7 +75,8 @@ final class action {
         pix_icon $icon,
         array $attributes = [],
         bool $popup = false,
-        ?lang_string $title = null
+        ?lang_string $title = null,
+        array $subactions = []
     ) {
         $this->url = $url;
         $this->icon = $icon;
@@ -79,6 +84,7 @@ final class action {
         $this->popup = $popup;
         // If title is not passed, check the title attribute from the icon.
         $this->title = $title ?? $icon->attributes['title'] ?? '';
+        $this->subactions = $subactions;
     }
 
     /**
@@ -95,13 +101,43 @@ final class action {
     }
 
     /**
-     * Return action menu link suitable for output, or null if the action cannot be displayed (because one of its callbacks
-     * returned false, {@see add_callback})
+     * Add a submenu action to this action
+     *
+     * @param self $subaction
+     * @return self
+     */
+    public function add_subaction(self $subaction): self {
+        $this->subactions[] = $subaction;
+        return $this;
+    }
+
+    /**
+     * Whether report action has any sub actions
+     *
+     * @return bool
+     */
+    public function has_subactions(): bool {
+        return !empty($this->subactions);
+    }
+
+    /**
+     * Return report action sub actions
+     *
+     * @return array
+     */
+    public function get_subactions(): array {
+        return $this->subactions;
+    }
+
+    /**
+     * Return action menu link| sub action link suitable for output, or null if the action cannot be displayed
+     * (because one of its callbacks returned false, {@see add_callback})
      *
      * @param stdClass $row
-     * @return action_menu_link|null
+     * @param bool $issubaction
+     * @return null|action_menu_link|action_link
      */
-    public function get_action_link(stdClass $row): ?action_menu_link {
+    public function get_action_link(stdClass $row, bool $issubaction = false): action_menu_link|action_link|null {
 
         foreach ($this->callbacks as $callback) {
             $row = clone $row; // Clone so we don't modify the shared row inside a callback.
@@ -133,8 +169,42 @@ final class action {
         // Ensure title attribute isn't duplicated.
         $title = $attributes['title'];
         unset($attributes['title']);
+        $subactions = self::build_subactions($this, $row);
 
-        return new action_menu_link($url, $this->icon, $title, null, $attributes);
+        if ($issubaction) {
+            return new action_link($url, $title, null, $attributes, $this->icon, $subactions);
+        } else {
+            return new action_menu_link($url, $this->icon, $title, false, $attributes, $subactions);
+        }
+    }
+
+    /**
+     * Get the subaction for the given action/subaction.
+     *
+     * @param self $action
+     * @param stdClass $row
+     *
+     * @return array
+     */
+    private static function build_subactions(self $action, stdClass $row): array {
+        global $OUTPUT;
+        $subactions = [];
+
+        // If the action has subactions, format them for the menu.
+        if ($action->has_subactions()) {
+            $subactions = array_map(static function (self $subaction) use ($row, $OUTPUT): ?stdClass {
+                $subactioninstance = $subaction->get_action_link($row, true);
+
+                // If there's no subaction instance, return null.
+                if (!$subactioninstance) {
+                    return null;
+                }
+
+                // Export the subaction instance for the template.
+                return $subactioninstance->export_for_template($OUTPUT);
+            }, $action->get_subactions());
+        }
+        return array_filter($subactions);
     }
 
     /**
